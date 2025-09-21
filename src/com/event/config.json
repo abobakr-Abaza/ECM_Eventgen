@@ -1,0 +1,244 @@
+{
+  "properties": [
+    {
+      "action": "update",
+      "name": "Status",
+      "value": "Pending",
+      "type": "String"
+    },
+    {
+      "action": "update",
+      "name": "Priority",
+      "value": "5",
+      "type": "Integer"
+    },
+    {
+      "action": "print",
+      "name": "Region",
+      "value": "Global",
+      "type": "String"
+    }
+  ],
+
+  "folderOperations": [
+    {
+      "name": "TopLevelFolderOps",
+      "parentPath": "path:/incoming",
+      "unfileFirst": true,
+      "saveAfterOps": true,
+      "tree": [
+        {
+          "type": "static",
+          "name": "MainStatic",
+          "fileHere": false,
+          "children": [
+            {
+              "type": "property",
+              "propertyName": "Status",
+              "fileHere": true
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "name": "ByDate",
+          "dateFormat": "yyyy/MM/dd",
+          "fileHere": false
+        },
+        {
+          "type": "classBased",
+          "name": "ClassMap",
+          "classToFolder": {
+            "com.acme.Contract": "ContractsFolder",
+            "com.acme.Invoice": "InvoicesFolder",
+            "com.acme.Report": "ReportsFolder"
+          },
+          "fileHere": false,
+          "children": [
+            {
+              "type": "static",
+              "name": "NestedStatic",
+              "fileHere": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "security": [
+    { "grantee": "Admin", "permissions": ["ALL"] },
+    { "grantee": "Auditor", "permissions": ["READ", "VIEW_CONTENT"] },
+    { "grantee": "User", "permissions": ["READ", "WRITE"] }
+  ],
+
+  "climbUpList": [
+    "/Global",
+    "/Regions/${Region}",
+    "/Archive"
+  ],
+
+  "dynamicParentList": [
+    "/Docs/${DocumentType}",
+    "/Archive/${DocumentType}"
+  ],
+
+  "conditions": [
+    {
+      "conditions": [
+        { "property": "Status", "operator": "equals", "value": "Approved" },
+        { "property": "Priority", "operator": "gt", "value": "5" },
+        { "property": "Region", "operator": "contains", "value": "US" }
+      ],
+      "operations": {
+        "propertyUpdates": [
+          { "action": "update", "name": "Maker", "value": "1", "type": "Integer" },
+          { "action": "update", "name": "Checker", "value": "1", "type": "Integer" }
+        ],
+        "folderOperations": [
+          {
+            "name": "ApprovedOps",
+            "parentPath": "climbUp:/Global",
+            "unfileFirst": false,
+            "saveAfterOps": true,
+            "tree": [
+              {
+                "type": "static",
+                "name": "ApprovedHighPriority",
+                "fileHere": true
+              },
+              {
+                "type": "date",
+                "name": "ApprovedByDate",
+                "dateFormat": "yyyy-MM-dd",
+                "fileHere": false
+              }
+            ]
+          }
+        ],
+        "securityUpdates": [
+          { "grantee": "Managers", "permissions": ["READ", "WRITE", "VIEW_CONTENT"] },
+          { "grantee": "Reviewers", "permissions": ["READ", "VIEW_CONTENT"] }
+        ]
+      }
+    },
+    {
+      "conditions": [
+        { "property": "Status", "operator": "equals", "value": "Rejected" },
+        { "property": "Priority", "operator": "lt", "value": "3" }
+      ],
+      "operations": {
+        "propertyUpdates": [
+          { "action": "update", "name": "Maker", "value": "0", "type": "Integer" },
+          { "action": "update", "name": "Checker", "value": "0", "type": "Integer" }
+        ],
+        "folderOperations": [
+          {
+            "name": "RejectedOps",
+            "parentPath": "dynamic:/Archive/${DocumentType}",
+            "unfileFirst": true,
+            "saveAfterOps": false,
+            "tree": [
+              {
+                "type": "static",
+                "name": "RejectedLowPriority",
+                "fileHere": true
+              },
+              {
+                "type": "classBased",
+                "name": "RejectedClassMap",
+                "classToFolder": {
+                  "com.acme.Contract": "RejectedContracts",
+                  "com.acme.Invoice": "RejectedInvoices"
+                },
+                "fileHere": false
+              }
+            ]
+          }
+        ],
+        "securityUpdates": [
+          { "grantee": "Managers", "permissions": ["READ", "VIEW_CONTENT"] },
+          { "grantee": "Reviewers", "permissions": ["READ", "WRITE", "VIEW_CONTENT"] }
+        ]
+      }
+    },
+    {
+      "conditions": [
+        { "property": "Status", "operator": "equals", "value": "Pending" },
+        { "property": "DocumentType", "operator": "equals", "value": "Contract" }
+      ],
+      "operations": {
+        "propertyUpdates": [
+          { "action": "update", "name": "Priority", "value": "7", "type": "Integer" },
+          { "action": "update", "name": "Region", "value": "APAC", "type": "String" }
+        ],
+        "folderOperations": [
+          {
+            "name": "PendingOps",
+            "parentPath": "path:/incoming",
+            "unfileFirst": false,
+            "saveAfterOps": true,
+            "tree": [
+              {
+                "type": "property",
+                "propertyName": "DocumentType",
+                "fileHere": true
+              },
+              {
+                "type": "date",
+                "name": "PendingByDate",
+                "dateFormat": "dd-MM-yyyy",
+                "fileHere": false
+              }
+            ]
+          }
+        ],
+        "securityUpdates": [
+          { "grantee": "Legal", "permissions": ["READ", "WRITE", "VIEW_CONTENT"] },
+          { "grantee": "Finance", "permissions": ["READ", "VIEW_CONTENT"] }
+        ]
+      }
+    },
+    {
+      "conditions": [
+        { "property": "Status", "operator": "equals", "value": "Not Approved" },
+        { "property": "Maker", "operator": "equals", "value": "0" },
+        { "property": "Checker", "operator": "equals", "value": "1" }
+      ],
+      "operations": {
+        "propertyUpdates": [
+          { "action": "update", "name": "Maker", "value": "1", "type": "Integer" },
+          { "action": "update", "name": "Checker", "value": "0", "type": "Integer" }
+        ],
+        "folderOperations": [
+          {
+            "name": "NotApprovedOps",
+            "parentPath": "current",
+            "unfileFirst": true,
+            "saveAfterOps": true,
+            "tree": [
+              {
+                "type": "static",
+                "name": "NotApprovedFolder",
+                "fileHere": true
+              },
+              {
+                "type": "classBased",
+                "name": "NAClassMap",
+                "classToFolder": {
+                  "com.acme.Contract": "NAContracts",
+                  "com.acme.Invoice": "NAInvoices"
+                },
+                "fileHere": false
+              }
+            ]
+          }
+        ],
+        "securityUpdates": [
+          { "grantee": "FN_ILC_Mkr", "permissions": ["READ", "VIEW_CONTENT"] },
+          { "grantee": "FN_ILC_Chkr", "permissions": ["READ", "WRITE", "VIEW_CONTENT"] }
+        ]
+      }
+    }
+  ]
+}
