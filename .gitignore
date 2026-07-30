@@ -1,0 +1,43 @@
+# Config files (contain environment-specific paths and sensitive data)
+src/JsonFiles/*.json
+bin/JsonFiles/*.json
+bin/
+
+# Sensitive/Environment-specific files
+*.properties
+*credentials*
+*secret*
+*.env
+
+# Generated files
+*.class
+*.jar
+!lib/*.jar
+!CreateDerivativesContracts/lib/*.jar
+
+# Output folder
+CreateDerivativesContracts/output/
+CreateDerivativesContracts/bin/
+
+# IDE files
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# Claude Code settings
+.claude/
+
+# Backup files
+*.rar
+*.bak
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated Java files in root
+AddDoc*.java
+Update*.java
